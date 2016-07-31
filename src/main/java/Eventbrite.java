@@ -51,12 +51,20 @@ public class Eventbrite {
 					for (int j = 0; j < elementsByTag.size(); j++) {
 						last = elementsByTag.get(j);
 					}
-					if (last.toString().contains("None")) {
-						value = 0;
-					} else {
-						System.out.println(param + " : " + last.toString());
-						value = 0;
-						// TODO parse
+
+					value = 0;
+					Elements allElements = last.getAllElements();
+					for (int j = 0; j < allElements.size(); j++) {
+						Element e = allElements.get(0);
+						if(e.hasText()){
+							String text = e.text();
+							try {
+								int parse = Integer.valueOf(text.trim());
+								value = parse;
+							} catch (NumberFormatException e1) {
+								e1.printStackTrace();
+							}
+						}
 					}
 
 					try {
@@ -65,11 +73,12 @@ public class Eventbrite {
 						e.printStackTrace();
 					}
 				}
-			} else {
+
 			}
 		}
 
 		return data;
+
 	}
 
 	private String loadFile(String url) {

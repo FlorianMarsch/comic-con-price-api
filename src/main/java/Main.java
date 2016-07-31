@@ -40,13 +40,11 @@ public class Main {
 
 			try {
 				JSONObject data = new JSONObject();
-				data.put("SamstagTicket", 0);
-				data.put("SontagTicket", 0);
-				data.put("WochenendTicket", 0);
-				data.put("VIPTicket", 0);
-				for (int i = 0; i < 25; i++) {
-					data.put("Fotoshoot " + i, 0);
-				}
+				data.put("saturday", 0);
+				data.put("sunday", 0);
+				data.put("weekend", 0);
+				data.put("vip", 0);
+				
 				attributes.put("data", data.toString());
 			} catch (Exception e) {
 				// TODO Auto-generated catch block

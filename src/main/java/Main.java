@@ -13,6 +13,7 @@ import java.util.Set;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.json.JSONArray;
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -33,55 +34,27 @@ public class Main {
 		port(Integer.valueOf(System.getenv("PORT")));
 		staticFileLocation("/public");
 
-		get("/api/lineup/:id", (request, response) -> {
-
-			String id = request.params(":id");
-			Set<String> recivedLineUp = reciveLineUp(id);
+		get("/api/comiccon/2017/", (request, response) -> {
 
 			Map<String, Object> attributes = new HashMap<>();
 
-			JSONArray data = new JSONArray();
-			for (String playerName : recivedLineUp) {
-				data.put(playerName);
+			try {
+				JSONObject data = new JSONObject();
+				data.put("SamstagTicket", 0);
+				data.put("SontagTicket", 0);
+				data.put("WochenendTicket", 0);
+				data.put("VIPTicket", 0);
+				for (int i = 0; i < 25; i++) {
+					data.put("Fotoshoot " + i, 0);
+				}
+				attributes.put("data", data.toString());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-			attributes.put("data", data.toString());
 
 			return new ModelAndView(attributes, "json.ftl");
 		} , new FreeMarkerEngine());
-	}
-
-	public Set<String> reciveLineUp(String id) {
-		if (id == null | id.trim().isEmpty()) {
-			return new HashSet<>();
-		}
-		try {
-			String html = null;
-			String urlString = "http://classic.comunio.de/playerInfo.phtml?pid="+id;
-			InputStream is = (InputStream) new URL(urlString).getContent();
-			html = IOUtils.toString(is, "UTF-8");
-
-			html = Normalizer.normalize(html, Normalizer.Form.NFD);
-			html = html.replaceAll("[^\\p{ASCII}]", "");
-
-			Document doc = Jsoup.parse(html);
-			Elements lines = doc.select(".name_cont");
-
-			Set<String> teamList = new HashSet<String>();
-			for (int i = 0; i < lines.size(); i++) {
-				Element line = lines.get(i);
-				String tempName = line.html();
-				tempName = StringEscapeUtils.unescapeHtml(tempName);
-				String norm = Normalizer.normalize(tempName, Normalizer.Form.NFD);
-				norm = norm.replaceAll("[^\\p{ASCII}]", "");
-				String trim = norm.trim();
-
-				teamList.add(trim);
-			}
-			return teamList;
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RuntimeException("abbruch", e);
-		}
 	}
 
 }
